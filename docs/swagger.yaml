@@ -1,0 +1,41 @@
+basePath: /api/v1
+definitions:
+  handler.User:
+    properties:
+      age:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:9090
+info:
+  contact:
+    email: dgkwon90@gmail.com
+    name: Request permission of Example API
+    url: https://github.com/neulsang
+  description: This is a Test auth api server
+  title: AMS Fantastic Auth Swagger API
+  version: "1.0"
+paths:
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get user's info
+      parameters:
+      - description: id of the user
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.User'
+      summary: Get user
+swagger: "2.0"

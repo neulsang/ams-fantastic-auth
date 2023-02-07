@@ -7,6 +7,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// User struct
+type User struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
 func Singup(c *fiber.Ctx) error {
 	log.Println("Singup")
 	return nil
@@ -22,17 +29,29 @@ func Signout(c *fiber.Ctx) error {
 	return nil
 }
 
-func Users(c *fiber.Ctx) error {
+func GetUsers(c *fiber.Ctx) error {
 	fmt.Println("Users")
 	return nil
 }
 
-func User(ctx *fiber.Ctx) error {
+// @Summary Get user
+// @Description Get user's info
+// @Accept json
+// @Produce json
+// @Param id path string true "id of the user"
+// @Success 200 {object} handler.User
+// @Router /users/{id} [get]
+func GetUser(c *fiber.Ctx) error {
 	log.Println("User")
-	return nil
+	u := User{
+		ID:   "test",
+		Name: "tester",
+		Age:  99,
+	}
+	return c.JSON(u)
 }
 
-func PutUser(ctx *fiber.Ctx) error {
+func PutUser(c *fiber.Ctx) error {
 	log.Println("PutUser")
 	return nil
 }
