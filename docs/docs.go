@@ -9,17 +9,22 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
+        "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "Request permission of Example API",
+            "name": "API Support",
             "url": "https://github.com/neulsang",
             "email": "dgkwon90@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users/{id}": {
+        "/v1/users/{id}": {
             "get": {
                 "description": "Get user's info",
                 "consumes": [
@@ -42,7 +47,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.User"
+                            "$ref": "#/definitions/handlers.User"
                         }
                     }
                 }
@@ -50,7 +55,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.User": {
+        "handlers.User": {
             "type": "object",
             "properties": {
                 "age": {
@@ -71,7 +76,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:9090",
-	BasePath:         "/api/v1",
+	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "AMS Fantastic Auth Swagger API",
 	Description:      "This is a Test auth api server",

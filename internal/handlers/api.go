@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"fmt"
@@ -39,8 +39,8 @@ func GetUsers(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "id of the user"
-// @Success 200 {object} handler.User
-// @Router /users/{id} [get]
+// @Success 200 {object} handlers.User
+// @Router /v1/users/{id} [get]
 func GetUser(c *fiber.Ctx) error {
 	log.Println("User")
 	u := User{

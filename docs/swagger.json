@@ -3,17 +3,22 @@
     "info": {
         "description": "This is a Test auth api server",
         "title": "AMS Fantastic Auth Swagger API",
+        "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "Request permission of Example API",
+            "name": "API Support",
             "url": "https://github.com/neulsang",
             "email": "dgkwon90@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "1.0"
     },
     "host": "localhost:9090",
-    "basePath": "/api/v1",
+    "basePath": "/api",
     "paths": {
-        "/users/{id}": {
+        "/v1/users/{id}": {
             "get": {
                 "description": "Get user's info",
                 "consumes": [
@@ -36,7 +41,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.User"
+                            "$ref": "#/definitions/handlers.User"
                         }
                     }
                 }
@@ -44,7 +49,7 @@
         }
     },
     "definitions": {
-        "handler.User": {
+        "handlers.User": {
             "type": "object",
             "properties": {
                 "age": {
