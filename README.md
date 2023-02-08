@@ -19,3 +19,8 @@
 ```
 위 구조는 변경 될 수 있음을 명시한다.
 ```
+
+## swag command
+```
+swag init -g ./cmd/ams-fantastic-auth/main.go  
+```
