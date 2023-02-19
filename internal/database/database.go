@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	username = "tester"         // "neulsang"
-	password = "test001"        // "ams@)23"
-	hostname = "localhost:3306" // "122.39.1.75:9006"
-	dbname   = "testdb"         // "ams"
+	username = "tester"
+	password = "test001"
+	hostname = "localhost:3306"
+	dbname   = "testdb"
 )
 
 func dsn() string {
