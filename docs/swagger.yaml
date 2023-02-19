@@ -1,12 +1,65 @@
 basePath: /api
 definitions:
-  handlers.User:
+  model.BirthDate:
     properties:
-      age:
+      day:
+        example: 29
         type: integer
+      month:
+        example: 7
+        type: integer
+      year:
+        example: 1990
+        type: integer
+    type: object
+  model.QnA:
+    properties:
+      answer:
+        example: blue
+        maxLength: 255
+        type: string
+      question:
+        example: What is my favorite color?
+        maxLength: 255
+        type: string
+    type: object
+  model.User:
+    properties:
+      birthDate:
+        $ref: '#/definitions/model.BirthDate'
+      email:
+        example: dgkwon90@naver.com
+        maxLength: 255
+        type: string
+      gender:
+        enum:
+        - male
+        - ' female'
+        - ' other'
+        example: male
+        type: string
       id:
+        example: dgkwon90
+        maxLength: 36
         type: string
       name:
+        example: 권대근
+        maxLength: 255
+        type: string
+      password:
+        example: test1234
+        maxLength: 255
+        type: string
+      qna:
+        $ref: '#/definitions/model.QnA'
+    type: object
+  response.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
         type: string
     type: object
 host: localhost:9090
@@ -23,11 +76,105 @@ info:
   title: AMS Fantastic Auth Swagger API
   version: "1.0"
 paths:
-  /v1/users/{id}:
+  /v1/users:
     get:
       consumes:
       - application/json
-      description: Get user's info
+      description: Get all exists users.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Get all exists users.
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new book.
+      parameters:
+      - description: users infomation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Create a new user.
+      tags:
+      - User
+  /v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by given ID.
+      parameters:
+      - description: id of the user
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Delete user by given ID.
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Get user by given ID.
       parameters:
       - description: id of the user
         in: path
@@ -40,6 +187,58 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.User'
-      summary: Get user
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Get user by given ID.
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user.
+      parameters:
+      - description: id of the user
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: users infomation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Update user.
+      tags:
+      - User
 swagger: "2.0"

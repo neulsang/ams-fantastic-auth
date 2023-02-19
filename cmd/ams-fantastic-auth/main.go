@@ -2,6 +2,7 @@ package main
 
 import (
 	"ams-fantastic-auth/internal/configs"
+	"ams-fantastic-auth/internal/database"
 	"ams-fantastic-auth/internal/middleware"
 	"ams-fantastic-auth/internal/routes"
 	"log"
@@ -28,6 +29,17 @@ func main() {
 
 	// Define Fiber config.
 	config := configs.Fiber()
+
+	// database init.
+
+	if db, dbErr := database.New(); dbErr == nil {
+		if initTableErr := database.CreateUsersTable(db); initTableErr != nil {
+			log.Fatal(initTableErr)
+		}
+	} else {
+		log.Fatal(dbErr)
+		//log.Println(dbErr)
+	}
 
 	app := fiber.New(config)
 
