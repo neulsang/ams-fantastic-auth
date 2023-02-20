@@ -51,10 +51,17 @@ func UpdateUser(db *sql.DB, user *model.User) error {
 	}
 	defer stmt.Close()
 
+	/*result*/
 	_, execErr := stmt.Exec(user.Email, user.Name, user.BirthDate.Year, user.BirthDate.Month, user.BirthDate.Day, user.Gender, user.Password, user.QnA.Question, user.QnA.Answer, user.ID)
 	if execErr != nil {
 		return execErr
 	}
+
+	// cnt, affErr := result.RowsAffected()
+	// if affErr != nil {
+	// 	return affErr
+	// }
+
 	return nil
 }
 

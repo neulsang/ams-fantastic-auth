@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"ams-fantastic-auth/internal/configs"
 	"ams-fantastic-auth/internal/database"
 	"ams-fantastic-auth/internal/model"
 	"ams-fantastic-auth/internal/response"
@@ -11,16 +12,6 @@ import (
 )
 
 type UserAPI struct {
-}
-
-func Login(c *fiber.Ctx) error {
-	log.Println("Signin")
-	return nil
-}
-
-func Logout(c *fiber.Ctx) error {
-	log.Println("Signout")
-	return nil
 }
 
 // CreateUser
@@ -52,7 +43,7 @@ func CreateUser(c *fiber.Ctx) error {
 	log.Printf("qna question: %v", user.QnA.Question)
 	log.Printf("qna answer: %v", user.QnA.Answer)
 
-	db, newErr := database.New()
+	db, newErr := database.New(configs.Database())
 	if newErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, newErr)
 		return newErr
@@ -62,6 +53,12 @@ func CreateUser(c *fiber.Ctx) error {
 	if insertErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, insertErr)
 		return insertErr
+	}
+
+	if user == nil {
+		notContent := errors.New("data is nil")
+		response.NewError(c, fiber.StatusNoContent, notContent)
+		return notContent
 	}
 
 	return c.JSON(user)
@@ -80,7 +77,7 @@ func CreateUser(c *fiber.Ctx) error {
 // @Failure	500	{object} response.HTTPError
 // @Router /v1/users [get]
 func GetUsers(c *fiber.Ctx) error {
-	db, newErr := database.New()
+	db, newErr := database.New(configs.Database())
 	if newErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, newErr)
 		return newErr
@@ -89,7 +86,15 @@ func GetUsers(c *fiber.Ctx) error {
 	users, selectErr := database.SelectUsers(db)
 	if selectErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, selectErr)
+		return selectErr
 	}
+
+	if users == nil {
+		notContent := errors.New("data is nil")
+		response.NewError(c, fiber.StatusNoContent, notContent)
+		return notContent
+	}
+
 	return c.JSON(users)
 }
 
@@ -115,7 +120,7 @@ func GetUser(c *fiber.Ctx) error {
 	}
 	log.Println("path id: ", id)
 
-	db, newErr := database.New()
+	db, newErr := database.New(configs.Database())
 	if newErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, newErr)
 		return newErr
@@ -124,7 +129,15 @@ func GetUser(c *fiber.Ctx) error {
 	user, selectErr := database.SelectUser(db, id)
 	if selectErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, selectErr)
+		return selectErr
 	}
+
+	if user == nil {
+		notContent := errors.New("data is nil")
+		response.NewError(c, fiber.StatusNoContent, notContent)
+		return notContent
+	}
+
 	return c.JSON(user)
 }
 
@@ -167,7 +180,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	log.Printf("qna question: %v", user.QnA.Question)
 	log.Printf("qna answer: %v", user.QnA.Answer)
 
-	db, newErr := database.New()
+	db, newErr := database.New(configs.Database())
 	if newErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, newErr)
 		return newErr
@@ -204,7 +217,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	}
 	log.Println("path id: ", id)
 
-	db, newErr := database.New()
+	db, newErr := database.New(configs.Database())
 	if newErr != nil {
 		response.NewError(c, fiber.StatusInternalServerError, newErr)
 		return newErr

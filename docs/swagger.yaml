@@ -12,6 +12,17 @@ definitions:
         example: 1990
         type: integer
     type: object
+  model.Login:
+    properties:
+      id:
+        example: dgkwon90
+        maxLength: 36
+        type: string
+      password:
+        example: test1234
+        maxLength: 255
+        type: string
+    type: object
   model.QnA:
     properties:
       answer:
@@ -76,6 +87,74 @@ info:
   title: AMS Fantastic Auth Swagger API
   version: "1.0"
 paths:
+  /v1/Login:
+    post:
+      consumes:
+      - application/json
+      description: Login.
+      parameters:
+      - description: Login infomation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Login.
+      tags:
+      - Login
+  /v1/Logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout.
+      parameters:
+      - description: Logout infomation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Logout.
+      tags:
+      - Logout
   /v1/users:
     get:
       consumes:

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"ams-fantastic-auth/internal/configs"
 	"database/sql"
 
 	"fmt"
@@ -9,19 +10,12 @@ import (
 	_ "github.com/go-sql-driver/mysql" //초기화를 위해 필요함
 )
 
-const (
-	username = "tester"
-	password = "test001"
-	hostname = "localhost:3306"
-	dbname   = "testdb"
-)
-
-func dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s", username, password, hostname, dbname)
+func dsn(config configs.DBConfig) string {
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s", config.UserName, config.Password, config.HostName, config.DBName)
 }
 
-func New() (*sql.DB, error) {
-	connDsn := dsn()
+func New(config configs.DBConfig) (*sql.DB, error) {
+	connDsn := dsn(config)
 	log.Println("dns: ", connDsn)
 
 	db, err := sql.Open("mysql", connDsn)

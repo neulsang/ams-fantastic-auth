@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
 // @title AMS Fantastic Auth Swagger API
@@ -26,13 +27,18 @@ import (
 // @host localhost:9090
 // @BasePath /api
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("could not load .env file: %v", err)
+	}
 
-	// Define Fiber config.
-	config := configs.Fiber()
+	// Define Fiber fiberConfig.
+	fiberConfig := configs.Fiber()
+	// Define Database DatabaseConfig.
+	databaseConfig := configs.Database()
 
 	// database init.
-
-	if db, dbErr := database.New(); dbErr == nil {
+	if db, dbErr := database.New(databaseConfig); dbErr == nil {
 		if initTableErr := database.CreateUsersTable(db); initTableErr != nil {
 			log.Fatal(initTableErr)
 		}
@@ -41,14 +47,15 @@ func main() {
 		//log.Println(dbErr)
 	}
 
-	app := fiber.New(config)
+	app := fiber.New(fiberConfig)
 
 	// Middlewares.
 	middleware.Fiber(app)
 
 	// Swagger
 	routes.Swagger(app)
-	routes.Api(app)
+	routes.LoginApi(app)
+	routes.UserApi(app)
 
 	log.Fatal(app.Listen(":9090"))
 }

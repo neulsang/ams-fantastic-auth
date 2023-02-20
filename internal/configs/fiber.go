@@ -1,8 +1,7 @@
 package configs
 
 import (
-	"os"
-	"strconv"
+	"ams-fantastic-auth/pkg/env"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,7 +11,7 @@ import (
 // See: https://docs.gofiber.io/api/fiber#config
 func Fiber() fiber.Config {
 	// Define server settings.
-	readTimeoutSecondsCount, _ := strconv.Atoi(os.Getenv("SERVER_READ_TIMEOUT"))
+	readTimeoutSecondsCount := env.GetAsInt("SERVER_READ_TIMEOUT", 0)
 
 	// Return Fiber configuration.
 	return fiber.Config{

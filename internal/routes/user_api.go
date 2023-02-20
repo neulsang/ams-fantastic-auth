@@ -6,12 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Api(app *fiber.App) {
+func UserApi(app *fiber.App) {
 	routeV1 := app.Group("/api/v1")
-
-	routeV1.Post("/login", handlers.Login)
-	routeV1.Delete("/logout", handlers.Logout)
-
 	routeV1.Post("/users", handlers.CreateUser)
 	routeV1.Get("/users", handlers.GetUsers)
 	routeV1.Get("/users/:id", handlers.GetUser)
