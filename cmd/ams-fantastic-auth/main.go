@@ -6,10 +6,23 @@ import (
 	"ams-fantastic-auth/internal/middleware"
 	"ams-fantastic-auth/internal/routes"
 	"log"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
+
+var (
+	// GitCommit, BuildTime, Get infos at build time the golang.
+	GitCommit string
+	BuildTime string
+)
+
+func buildInfoPrint() {
+	// default log
+	log.Printf("Build Information : %v at %v\n", GitCommit, BuildTime)
+	log.Println("Started at :", time.Now().Format(time.RFC3339))
+}
 
 // @title AMS Fantastic Auth Swagger API
 // @version 1.0
@@ -27,6 +40,7 @@ import (
 // @host localhost:9090
 // @BasePath /api
 func main() {
+	buildInfoPrint()
 	err := godotenv.Load()
 	if err != nil {
 		log.Printf("could not load .env file: %v", err)

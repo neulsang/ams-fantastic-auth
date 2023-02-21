@@ -47,3 +47,9 @@ go run을 통해 바로 ams-fantastic-auth app을 실행 시켜줄수 있다.
 go run cmd/ams-fantastic-auth/main.go
 
 ```
+
+## docker build command
+
+```shell
+ docker build -t ams-fantastic-auth:1.0.0 -f build/Dockerfile .
+ ```

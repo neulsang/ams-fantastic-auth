@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  ams-fantastic-auth:
+    container_name: ams-fantastic-auth
+    ports:
+      - 9090:9090
+    image: ams-fantastic-auth:1.0.0
+    restart: always
+    env_file: ./.env
+    environment:
+      - TZ=Asia/Seoul
+    networks:
+      - backing-service-net
+    
+networks:
+  backing-service-net:
+    name: backing-service-net
+    external: true
