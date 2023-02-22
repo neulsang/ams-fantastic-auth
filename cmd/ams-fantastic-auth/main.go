@@ -37,7 +37,7 @@ func buildInfoPrint() {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:9090
+// @host 122.39.1.75:9090
 // @BasePath /api
 func main() {
 	buildInfoPrint()

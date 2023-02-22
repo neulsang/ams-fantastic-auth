@@ -485,7 +485,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:9090",
+	Host:             "122.39.1.75:9090",
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "AMS Fantastic Auth Swagger API",

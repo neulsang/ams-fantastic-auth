@@ -73,7 +73,7 @@ definitions:
         example: status bad request
         type: string
     type: object
-host: localhost:9090
+host: 122.39.1.75:9090
 info:
   contact:
     email: dgkwon90@gmail.com

@@ -15,7 +15,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:9090",
+    "host": "122.39.1.75:9090",
     "basePath": "/api",
     "paths": {
         "/v1/Login": {
