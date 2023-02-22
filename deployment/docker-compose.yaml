@@ -11,9 +11,9 @@ services:
     environment:
       - TZ=Asia/Seoul
     networks:
-      - backing-service-net
+      - backing-service
     
 networks:
   backing-service-net:
-    name: backing-service-net
+    name: backing-service
     external: true
