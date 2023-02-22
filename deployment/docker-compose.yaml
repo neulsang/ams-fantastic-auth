@@ -14,6 +14,6 @@ services:
       - backing-service
     
 networks:
-  backing-service-net:
+  backing-service:
     name: backing-service
     external: true
