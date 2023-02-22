@@ -33,7 +33,7 @@ go instatll github.com/swaggo/swag/cmd/swag@latest
 swag init을 통해 docs 문서를 만들어준다.
 
 ```shell
-swag init -g ./cmd/ams-fantastic-auth/main.go  
+swag init -g ./cmd/ams-fantastic-auth/main.go
 ```
 
 `* -g flag의 경우 main pacakge가 정의된 파일을 지정해준다.`
