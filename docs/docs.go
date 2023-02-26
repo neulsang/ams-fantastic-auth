@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/Login": {
+        "/v1/login": {
             "post": {
                 "description": "Login.",
                 "consumes": [
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.TokenResponse"
                         }
                     },
                     "400": {
@@ -76,8 +76,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/Logout": {
-            "post": {
+        "/v1/logout/{tokon_uuid}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Logout.",
                 "consumes": [
                     "application/json"
@@ -91,20 +96,18 @@ const docTemplate = `{
                 "summary": "Logout.",
                 "parameters": [
                     {
-                        "description": "Logout infomation",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Login"
-                        }
+                        "type": "string",
+                        "description": "uuid of the token",
+                        "name": "tokon_uuid",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -130,6 +133,11 @@ const docTemplate = `{
         },
         "/v1/users": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all exists users.",
                 "consumes": [
                     "application/json"
@@ -271,7 +279,55 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
+            "delete": {
+                "description": "Delete user by given ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete user by given ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the user",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.HTTPError"
+                        }
+                    }
+                }
+            },
+            "patch": {
                 "description": "Update user.",
                 "consumes": [
                     "application/json"
@@ -327,86 +383,23 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Delete user by given ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Delete user by given ID.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id of the user",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    }
-                }
             }
         }
     },
     "definitions": {
-        "model.BirthDate": {
-            "type": "object",
-            "properties": {
-                "day": {
-                    "type": "integer",
-                    "example": 29
-                },
-                "month": {
-                    "type": "integer",
-                    "example": 7
-                },
-                "year": {
-                    "type": "integer",
-                    "example": 1990
-                }
-            }
-        },
         "model.Login": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "string",
                     "maxLength": 36,
+                    "minLength": 1,
                     "example": "dgkwon90"
                 },
                 "password": {
                     "type": "string",
                     "maxLength": 255,
+                    "minLength": 8,
                     "example": "test1234"
                 }
             }
@@ -426,11 +419,46 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Token": {
+            "type": "object",
+            "properties": {
+                "create_at": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "$ref": "#/definitions/model.Token"
+                },
+                "refresh_token": {
+                    "$ref": "#/definitions/model.Token"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
                 "birthDate": {
-                    "$ref": "#/definitions/model.BirthDate"
+                    "type": "string",
+                    "example": "1990-07-29"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
                 },
                 "email": {
                     "type": "string",
@@ -463,6 +491,12 @@ const docTemplate = `{
                 },
                 "qna": {
                     "$ref": "#/definitions/model.QnA"
+                },
+                "update_at": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
                 }
             }
         },
@@ -479,13 +513,20 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "122.39.1.75:9090",
+	Host:             "localhost:9090",
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "AMS Fantastic Auth Swagger API",

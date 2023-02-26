@@ -3,6 +3,7 @@ package main
 import (
 	"ams-fantastic-auth/internal/configs"
 	"ams-fantastic-auth/internal/database"
+	"ams-fantastic-auth/internal/database/schema"
 	"ams-fantastic-auth/internal/middleware"
 	"ams-fantastic-auth/internal/routes"
 	"log"
@@ -37,7 +38,11 @@ func buildInfoPrint() {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host 122.39.1.75:9090
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
+// @host localhost:9090
 // @BasePath /api
 func main() {
 	buildInfoPrint()
@@ -53,7 +58,10 @@ func main() {
 
 	// database init.
 	if db, dbErr := database.New(databaseConfig); dbErr == nil {
-		if initTableErr := database.CreateUsersTable(db); initTableErr != nil {
+		if initTableErr := schema.CreateUsersTable(db); initTableErr != nil {
+			log.Fatal(initTableErr)
+		}
+		if initTableErr := schema.CreateTokenTable(db); initTableErr != nil {
 			log.Fatal(initTableErr)
 		}
 	} else {

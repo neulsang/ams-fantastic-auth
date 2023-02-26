@@ -11,9 +11,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type UserAPI struct {
-}
-
 // CreateUser
 //
 // @Summary Create a new user.
@@ -37,7 +34,7 @@ func CreateUser(c *fiber.Ctx) error {
 	log.Printf("id: %v", user.ID)
 	log.Printf("email: %v", user.Email)
 	log.Printf("name: %v", user.Name)
-	log.Printf("birtDate: %v", user.BirthDate.String())
+	log.Printf("birtDate: %v", user.BirthDate)
 	log.Printf("gender: %v", user.Gender)
 	log.Printf("password: %v", user.Password)
 	log.Printf("qna question: %v", user.QnA.Question)
@@ -75,6 +72,7 @@ func CreateUser(c *fiber.Ctx) error {
 // @Failure	400	{object} response.HTTPError
 // @Failure	404	{object} response.HTTPError
 // @Failure	500	{object} response.HTTPError
+// @Security ApiKeyAuth
 // @Router /v1/users [get]
 func GetUsers(c *fiber.Ctx) error {
 	db, newErr := database.New(configs.Database())
@@ -154,7 +152,7 @@ func GetUser(c *fiber.Ctx) error {
 // @Failure	400	{object} response.HTTPError
 // @Failure	404	{object} response.HTTPError
 // @Failure	500	{object} response.HTTPError
-// @Router /v1/users/{id} [put]
+// @Router /v1/users/{id} [patch]
 func UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
@@ -174,7 +172,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	user.ID = id
 	log.Printf("email: %v", user.Email)
 	log.Printf("name: %v", user.Name)
-	log.Printf("birtDate: %v", user.BirthDate.String())
+	log.Printf("birtDate: %v", user.BirthDate)
 	log.Printf("gender: %v", user.Gender)
 	log.Printf("password: %v", user.Password)
 	log.Printf("qna question: %v", user.QnA.Question)
@@ -192,7 +190,7 @@ func UpdateUser(c *fiber.Ctx) error {
 		return updateErr
 	}
 
-	return c.SendStatus(fiber.StatusCreated)
+	return c.SendStatus(fiber.StatusOK)
 }
 
 // DeleteUser

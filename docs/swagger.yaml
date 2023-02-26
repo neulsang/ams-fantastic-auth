@@ -1,26 +1,16 @@
 basePath: /api
 definitions:
-  model.BirthDate:
-    properties:
-      day:
-        example: 29
-        type: integer
-      month:
-        example: 7
-        type: integer
-      year:
-        example: 1990
-        type: integer
-    type: object
   model.Login:
     properties:
       id:
         example: dgkwon90
         maxLength: 36
+        minLength: 1
         type: string
       password:
         example: test1234
         maxLength: 255
+        minLength: 8
         type: string
     type: object
   model.QnA:
@@ -34,10 +24,33 @@ definitions:
         maxLength: 255
         type: string
     type: object
+  model.Token:
+    properties:
+      create_at:
+        type: string
+      expires_at:
+        type: string
+      user_id:
+        type: string
+      uuid:
+        type: string
+    type: object
+  model.TokenResponse:
+    properties:
+      access_token:
+        $ref: '#/definitions/model.Token'
+      refresh_token:
+        $ref: '#/definitions/model.Token'
+    type: object
   model.User:
     properties:
       birthDate:
-        $ref: '#/definitions/model.BirthDate'
+        example: "1990-07-29"
+        type: string
+      create_at:
+        type: string
+      deleted_at:
+        type: string
       email:
         example: dgkwon90@naver.com
         maxLength: 255
@@ -63,6 +76,10 @@ definitions:
         type: string
       qna:
         $ref: '#/definitions/model.QnA'
+      update_at:
+        type: string
+      uuid:
+        type: string
     type: object
   response.HTTPError:
     properties:
@@ -73,7 +90,7 @@ definitions:
         example: status bad request
         type: string
     type: object
-host: 122.39.1.75:9090
+host: localhost:9090
 info:
   contact:
     email: dgkwon90@gmail.com
@@ -87,7 +104,7 @@ info:
   title: AMS Fantastic Auth Swagger API
   version: "1.0"
 paths:
-  /v1/Login:
+  /v1/login:
     post:
       consumes:
       - application/json
@@ -105,7 +122,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/model.TokenResponse'
         "400":
           description: Bad Request
           schema:
@@ -121,25 +138,24 @@ paths:
       summary: Login.
       tags:
       - Login
-  /v1/Logout:
-    post:
+  /v1/logout/{tokon_uuid}:
+    delete:
       consumes:
       - application/json
       description: Logout.
       parameters:
-      - description: Logout infomation
-        in: body
-        name: user
+      - description: uuid of the token
+        in: path
+        name: tokon_uuid
         required: true
-        schema:
-          $ref: '#/definitions/model.Login'
+        type: string
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: ok
           schema:
-            $ref: '#/definitions/model.User'
+            type: string
         "400":
           description: Bad Request
           schema:
@@ -152,6 +168,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.HTTPError'
+      security:
+      - ApiKeyAuth: []
       summary: Logout.
       tags:
       - Logout
@@ -181,6 +199,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.HTTPError'
+      security:
+      - ApiKeyAuth: []
       summary: Get all exists users.
       tags:
       - Users
@@ -282,7 +302,7 @@ paths:
       summary: Get user by given ID.
       tags:
       - User
-    put:
+    patch:
       consumes:
       - application/json
       description: Update user.
@@ -320,4 +340,9 @@ paths:
       summary: Update user.
       tags:
       - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
