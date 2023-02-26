@@ -1,4 +1,4 @@
-package utils
+package jwt
 
 import (
 	"os"
@@ -8,10 +8,10 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// GenerateNewAccessToken func for generate a new Access token.
-func GenerateNewAccessToken() (string, error) {
+// GenerateNewToken func for generate a new token.
+func GenerateNewToken(expiresIn time.Duration, privateKey, userID string) (string, error) {
 	// Set secret key from .env file.
-	secret := os.Getenv("JWT_SECRET_KEY")
+	secret := privateKey
 
 	// Set expires minutes count for secret key from .env file.
 	minutesCount, _ := strconv.Atoi(os.Getenv("JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT"))
@@ -19,8 +19,13 @@ func GenerateNewAccessToken() (string, error) {
 	// Create a new claims.
 	claims := jwt.MapClaims{}
 
+	now := time.Now().UTC()
+
 	// Set public claims:
-	claims["exp"] = time.Now().Add(time.Minute * time.Duration(minutesCount)).Unix()
+	claims["sub"] = userID
+	claims["exp"] = now.Add(time.Minute * time.Duration(minutesCount)).Unix()
+	claims["iat"] = now.Unix()
+	claims["nbf"] = now.Unix()
 
 	// Create a new JWT access token with claims.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

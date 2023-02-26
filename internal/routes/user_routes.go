@@ -35,7 +35,7 @@ func UserApi(app *fiber.App) {
 	//routeV1 := app.Group("/api/v1")
 
 	routeV1.Post("/users", handlers.CreateUser)
-	routeV1.Get("/users", middleware.BearerAuthReq, handlers.GetUsers)
+	routeV1.Get("/users", middleware.BearerAuthReq2, handlers.GetUsers)
 	routeV1.Get("/users/:id", middleware.BearerAuthReq, handlers.GetUser)
 	routeV1.Patch("/users/:id", middleware.BearerAuthReq, handlers.UpdateUser)
 	routeV1.Delete("/users/:id", middleware.BearerAuthReq, handlers.DeleteUser)

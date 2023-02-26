@@ -40,9 +40,9 @@ func SelectUsers(db *sql.DB) ([]model.User, error) {
 			&user.Password,
 			&user.QnA.Question,
 			&user.QnA.Answer,
-			&user.CreateAt,
-			&user.UpdateAt,
-			&user.DeleteAt)
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.DeletedAt)
 		if scanErr != nil {
 			return nil, scanErr
 		}
@@ -55,7 +55,7 @@ func SelectUsers(db *sql.DB) ([]model.User, error) {
 func SelectUser(db *sql.DB, id string) (*model.User, error) {
 	var user model.User
 	var getUUID uuid.UUID
-	err := db.QueryRow("SELECT uuid, id, email, name, birthDate, gender, password, qna_question, qna_answer, created_at, updated_at, deleted_at FROM users WHERE id = ?", id).Scan(&getUUID, &user.ID, &user.Email, &user.Name, &user.BirthDate, &user.Gender, &user.Password, &user.QnA.Question, &user.QnA.Answer, &user.CreateAt, &user.UpdateAt, &user.DeleteAt)
+	err := db.QueryRow("SELECT uuid, id, email, name, birthDate, gender, password, qna_question, qna_answer, created_at, updated_at, deleted_at FROM users WHERE id = ?", id).Scan(&getUUID, &user.ID, &user.Email, &user.Name, &user.BirthDate, &user.Gender, &user.Password, &user.QnA.Question, &user.QnA.Answer, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	if err != nil {
 		return nil, err
 	}

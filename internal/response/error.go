@@ -3,12 +3,12 @@ package response
 import "github.com/gofiber/fiber/v2"
 
 // NewError example
-func NewError(ctx *fiber.Ctx, status int, err error) {
+func NewError(ctx *fiber.Ctx, status int, message string) error {
 	er := HTTPError{
 		Code:    status,
-		Message: err.Error(),
+		Message: message,
 	}
-	ctx.JSON(er)
+	return ctx.Status(status).JSON(er)
 }
 
 // HTTPError example

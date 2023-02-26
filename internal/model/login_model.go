@@ -16,5 +16,5 @@ type Token struct {
 	UUID      string    `json:"uuid"`
 	UserID    string    `json:"user_id"`
 	ExpiresAt time.Time `json:"expires_at"`
-	CreateAt  string    `json:"create_at"`
+	CreatedAt string    `json:"created_at"`
 }

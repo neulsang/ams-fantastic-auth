@@ -27,7 +27,7 @@ func SelectToken(db *sql.DB, tokenUUID string) (*model.Token, error) {
 	var tokenInfo model.Token
 	var getUUID uuid.UUID
 
-	err := db.QueryRow("SELECT uuid, user_id, created_at  FROM token WHERE uuid = ?", tuuid).Scan(&getUUID, &tokenInfo.UserID, &tokenInfo.CreateAt)
+	err := db.QueryRow("SELECT uuid, user_id, created_at  FROM token WHERE uuid = ?", tuuid).Scan(&getUUID, &tokenInfo.UserID, &tokenInfo.CreatedAt)
 	if err != nil {
 		return nil, err
 	}

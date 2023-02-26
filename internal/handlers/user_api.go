@@ -5,10 +5,11 @@ import (
 	"ams-fantastic-auth/internal/database"
 	"ams-fantastic-auth/internal/model"
 	"ams-fantastic-auth/internal/response"
-	"errors"
 	"log"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateUser
@@ -19,7 +20,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param user body model.User true "users infomation"
-// @Success 200 {object} model.User
+// @Success 201 {object} model.User
 // @Failure	400	{object} response.HTTPError
 // @Failure	404	{object} response.HTTPError
 // @Failure	500	{object} response.HTTPError
@@ -27,8 +28,7 @@ import (
 func CreateUser(c *fiber.Ctx) error {
 	user := new(model.User)
 	if parseErr := c.BodyParser(user); parseErr != nil {
-		response.NewError(c, fiber.StatusBadRequest, parseErr)
-		return parseErr
+		return response.NewError(c, fiber.StatusBadRequest, parseErr.Error())
 	}
 
 	log.Printf("id: %v", user.ID)
@@ -42,23 +42,26 @@ func CreateUser(c *fiber.Ctx) error {
 
 	db, newErr := database.New(configs.Database())
 	if newErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, newErr)
-		return newErr
+		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
 	}
+	hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if hashErr != nil {
+		return response.NewError(c, fiber.StatusBadRequest, hashErr.Error())
+	}
+	user.Password = string(hashedPassword)
 
 	insertErr := database.InsertUser(db, user)
-	if insertErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, insertErr)
-		return insertErr
+	if insertErr != nil && strings.Contains(insertErr.Error(), "duplicate key value violates unique") {
+		return response.NewError(c, fiber.StatusConflict, "User with that email already exists")
+	} else if insertErr != nil {
+		return response.NewError(c, fiber.StatusBadGateway, "Something bad happened")
 	}
 
 	if user == nil {
-		notContent := errors.New("data is nil")
-		response.NewError(c, fiber.StatusNoContent, notContent)
-		return notContent
+		return response.NewError(c, fiber.StatusNoContent, "data is nil")
 	}
 
-	return c.JSON(user)
+	return c.Status(fiber.StatusCreated).JSON(user)
 }
 
 // GetUsers
@@ -77,20 +80,16 @@ func CreateUser(c *fiber.Ctx) error {
 func GetUsers(c *fiber.Ctx) error {
 	db, newErr := database.New(configs.Database())
 	if newErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, newErr)
-		return newErr
+		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
 	}
 
 	users, selectErr := database.SelectUsers(db)
 	if selectErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, selectErr)
-		return selectErr
+		return response.NewError(c, fiber.StatusInternalServerError, selectErr.Error())
 	}
 
 	if users == nil {
-		notContent := errors.New("data is nil")
-		response.NewError(c, fiber.StatusNoContent, notContent)
-		return notContent
+		return response.NewError(c, fiber.StatusNoContent, "data is nil")
 	}
 
 	return c.JSON(users)
@@ -112,28 +111,22 @@ func GetUsers(c *fiber.Ctx) error {
 func GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
-		nilErr := errors.New("id is nil")
-		response.NewError(c, fiber.StatusBadRequest, nilErr)
-		return nilErr
+		return response.NewError(c, fiber.StatusBadRequest, "id is nil")
 	}
 	log.Println("path id: ", id)
 
 	db, newErr := database.New(configs.Database())
 	if newErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, newErr)
-		return newErr
+		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
 	}
 
 	user, selectErr := database.SelectUser(db, id)
 	if selectErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, selectErr)
-		return selectErr
+		return response.NewError(c, fiber.StatusInternalServerError, selectErr.Error())
 	}
 
 	if user == nil {
-		notContent := errors.New("data is nil")
-		response.NewError(c, fiber.StatusNoContent, notContent)
-		return notContent
+		return response.NewError(c, fiber.StatusNoContent, "data is nil")
 	}
 
 	return c.JSON(user)
@@ -156,16 +149,13 @@ func GetUser(c *fiber.Ctx) error {
 func UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
-		nilErr := errors.New("id is nil")
-		response.NewError(c, fiber.StatusBadRequest, nilErr)
-		return nilErr
+		return response.NewError(c, fiber.StatusBadRequest, "id is nil")
 	}
 	log.Println("path id: ", id)
 
 	user := new(model.User)
 	if parseErr := c.BodyParser(user); parseErr != nil {
-		response.NewError(c, fiber.StatusBadRequest, parseErr)
-		return parseErr
+		return response.NewError(c, fiber.StatusBadRequest, parseErr.Error())
 	}
 
 	log.Printf("id: %v", user.ID)
@@ -180,14 +170,12 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	db, newErr := database.New(configs.Database())
 	if newErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, newErr)
-		return newErr
+		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
 	}
 
 	updateErr := database.UpdateUser(db, user)
 	if updateErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, updateErr)
-		return updateErr
+		return response.NewError(c, fiber.StatusInternalServerError, updateErr.Error())
 	}
 
 	return c.SendStatus(fiber.StatusOK)
@@ -209,22 +197,18 @@ func UpdateUser(c *fiber.Ctx) error {
 func DeleteUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
-		nilErr := errors.New("id is nil")
-		response.NewError(c, fiber.StatusBadRequest, nilErr)
-		return nilErr
+		return response.NewError(c, fiber.StatusBadRequest, "id is nil")
 	}
 	log.Println("path id: ", id)
 
 	db, newErr := database.New(configs.Database())
 	if newErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, newErr)
-		return newErr
+		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
 	}
 
 	updateErr := database.DeleteUser(db, id)
 	if updateErr != nil {
-		response.NewError(c, fiber.StatusInternalServerError, updateErr)
-		return updateErr
+		return response.NewError(c, fiber.StatusInternalServerError, updateErr.Error())
 	}
 
 	// Return status 204 no content.

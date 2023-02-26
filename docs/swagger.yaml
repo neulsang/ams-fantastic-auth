@@ -26,7 +26,7 @@ definitions:
     type: object
   model.Token:
     properties:
-      create_at:
+      created_at:
         type: string
       expires_at:
         type: string
@@ -47,7 +47,7 @@ definitions:
       birthDate:
         example: "1990-07-29"
         type: string
-      create_at:
+      created_at:
         type: string
       deleted_at:
         type: string
@@ -76,7 +76,7 @@ definitions:
         type: string
       qna:
         $ref: '#/definitions/model.QnA'
-      update_at:
+      updated_at:
         type: string
       uuid:
         type: string
@@ -218,8 +218,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/model.User'
         "400":
@@ -340,6 +340,74 @@ paths:
       summary: Update user.
       tags:
       - User
+  /v1/users/me:
+    get:
+      consumes:
+      - application/json
+      description: Get the login user’s credentials.
+      parameters:
+      - description: Login infomation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Get user's credentials.
+      tags:
+      - Me
+  /v1/users/refresh:
+    get:
+      consumes:
+      - application/json
+      description: Request a new access token.
+      parameters:
+      - description: Login infomation
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.HTTPError'
+      summary: Request a new access token.
+      tags:
+      - Refresh
 securityDefinitions:
   ApiKeyAuth:
     in: header

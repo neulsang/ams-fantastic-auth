@@ -10,13 +10,9 @@ type User struct {
 	Gender    string `json:"gender" enums:"male, female, other" example:"male"`
 	Password  string `json:"password" maxLength:"255" example:"test1234"`
 	QnA       QnA    `json:"qna"`
-	CreateAt  string `json:"create_at"`
-	UpdateAt  string `json:"update_at"`
-	DeleteAt  string `json:"deleted_at"`
-}
-
-func (u User) ValidateEmail() bool {
-	return true
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	DeletedAt string `json:"deleted_at"`
 }
 
 // Question and Answer struct
