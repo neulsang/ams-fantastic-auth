@@ -4,8 +4,8 @@ import (
 	"ams-fantastic-auth/internal/configs"
 	"ams-fantastic-auth/internal/database"
 	"ams-fantastic-auth/internal/model"
-	jwttool "ams-fantastic-auth/internal/pkg/jwt"
 	"ams-fantastic-auth/internal/response"
+	jwttool "ams-fantastic-auth/pkg/jwt"
 	"fmt"
 	"log"
 	"strings"
@@ -202,14 +202,16 @@ func Logout(c *fiber.Ctx) error {
 // @Tags Me
 // @Accept json
 // @Produce json
-// @Param user body model.Login true "Login infomation"
-// @Success 200 {object} model.TokenResponse
+// @Success 200 {object} model.User
 // @Failure	400	{object} response.HTTPError
 // @Failure	404	{object} response.HTTPError
 // @Failure	500	{object} response.HTTPError
-// @Router /v1/users/me [get]
+// @Router /v1/me [get]
 func Me(c *fiber.Ctx) error {
-	user := c.Locals("user").(model.User)
+	var user model.User
+	if c.Locals("user") != nil {
+		user = c.Locals("user").(model.User)
+	}
 	return c.Status(fiber.StatusOK).JSON(user)
 }
 
@@ -220,12 +222,11 @@ func Me(c *fiber.Ctx) error {
 // @Tags Refresh
 // @Accept json
 // @Produce json
-// @Param user body model.Login true "Login infomation"
 // @Success 200 {object} model.TokenResponse
 // @Failure	400	{object} response.HTTPError
 // @Failure	404	{object} response.HTTPError
 // @Failure	500	{object} response.HTTPError
-// @Router /v1/users/refresh [get]
+// @Router /v1/refresh [get]
 func Refresh(c *fiber.Ctx) error {
 	var refreshToken string
 	authorization := c.Get("Authorization")

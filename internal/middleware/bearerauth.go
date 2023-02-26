@@ -187,7 +187,7 @@ func BearerAuthReq2(c *fiber.Ctx) error {
 
 	accessJwtSercret := "AmsAccessJwtSecret"
 
-	tokenByte, err := jwt.Parse(tokenString, func(jwtToken *jwt.Token) (interface{}, error) {
+	tokenByte, parseErr := jwt.Parse(tokenString, func(jwtToken *jwt.Token) (interface{}, error) {
 		if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %s", jwtToken.Header["alg"])
 		}
@@ -195,8 +195,8 @@ func BearerAuthReq2(c *fiber.Ctx) error {
 		return []byte(accessJwtSercret), nil
 	})
 
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "fail", "message": fmt.Sprintf("invalidate token: %v", err)})
+	if parseErr != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "fail", "message": fmt.Sprintf("invalidate token: %v", parseErr)})
 	}
 
 	claims, ok := tokenByte.Claims.(jwt.MapClaims)
