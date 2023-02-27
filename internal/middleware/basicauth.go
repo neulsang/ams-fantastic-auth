@@ -28,15 +28,11 @@ func BasicAuthExtReq() func(*fiber.Ctx) error {
 				return false
 			}
 
-			user, selectErr := database.SelectUser(db, id)
+			userPassword, selectErr := database.SelectUserPassword(db, id)
 			if selectErr != nil {
 				return false
 			}
-
-			if user == nil {
-				return false
-			}
-			if id == user.ID && pass == user.Password {
+			if pass == userPassword {
 				return true
 			}
 			return false

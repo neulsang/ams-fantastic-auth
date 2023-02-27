@@ -7,7 +7,7 @@ import (
 )
 
 // GenerateNewToken func for generate a new token.
-func GenerateNewToken(expiresIn time.Duration, privateKey, userID string) (string, error) {
+func GenerateNewToken(expiresIn time.Duration, privateKey, userEmail string) (string, error) {
 	// Set secret key from .env file.
 	secret := privateKey
 
@@ -20,8 +20,8 @@ func GenerateNewToken(expiresIn time.Duration, privateKey, userID string) (strin
 	now := time.Now().UTC()
 
 	// Set public claims:
-	claims["sub"] = userID
-	claims["exp"] = now.Add(time.Minute * time.Duration(minutesCount)).Unix()
+	claims["sub"] = userEmail
+	claims["exp"] = now.Add(minutesCount).Unix()
 	claims["iat"] = now.Unix()
 	claims["nbf"] = now.Unix()
 

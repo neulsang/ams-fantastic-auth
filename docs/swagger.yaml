@@ -1,10 +1,9 @@
 definitions:
   model.Login:
     properties:
-      id:
-        example: dgkwon90
-        maxLength: 36
-        minLength: 1
+      email:
+        example: dgkwon90@naver.com
+        maxLength: 255
         type: string
       password:
         example: test1234
@@ -25,23 +24,43 @@ definitions:
     type: object
   model.Token:
     properties:
-      created_at:
-        type: string
-      expires_at:
-        type: string
-      user_id:
-        type: string
-      uuid:
-        type: string
-    type: object
-  model.TokenResponse:
-    properties:
       access_token:
-        $ref: '#/definitions/model.Token'
+        type: string
       refresh_token:
-        $ref: '#/definitions/model.Token'
+        type: string
     type: object
   model.User:
+    properties:
+      birth_date:
+        example: "1990-07-29"
+        type: string
+      email:
+        example: dgkwon90@naver.com
+        maxLength: 255
+        type: string
+      gender:
+        enum:
+        - male
+        - ' female'
+        - ' other'
+        example: male
+        type: string
+      name:
+        example: 권대근
+        maxLength: 255
+        type: string
+      nick_name:
+        example: dgkwon90
+        maxLength: 36
+        type: string
+      password:
+        example: test1234
+        maxLength: 255
+        type: string
+      qna:
+        $ref: '#/definitions/model.QnA'
+    type: object
+  model.UserResponse:
     properties:
       birthDate:
         example: "1990-07-29"
@@ -62,31 +81,18 @@ definitions:
         example: male
         type: string
       id:
-        example: dgkwon90
-        maxLength: 36
         type: string
       name:
         example: 권대근
         maxLength: 255
         type: string
-      password:
-        example: test1234
-        maxLength: 255
+      nick_name:
+        example: dgkwon90
+        maxLength: 36
         type: string
       qna:
         $ref: '#/definitions/model.QnA'
       updated_at:
-        type: string
-      uuid:
-        type: string
-    type: object
-  response.HTTPError:
-    properties:
-      code:
-        example: 400
-        type: integer
-      message:
-        example: status bad request
         type: string
     type: object
 info:
@@ -102,7 +108,7 @@ info:
   title: AMS Fantastic Auth Swagger API
   version: "1.0"
 paths:
-  /v1/login:
+  /api/v1/auth/login:
     post:
       consumes:
       - application/json
@@ -120,85 +126,28 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.TokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
+            $ref: '#/definitions/model.Token'
       summary: Login.
       tags:
-      - Login
-  /v1/logout/{tokon_uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Logout.
-      parameters:
-      - description: uuid of the token
-        in: path
-        name: tokon_uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ok
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-      security:
-      - ApiKeyAuth: []
-      summary: Logout.
-      tags:
-      - Logout
-  /v1/me:
+      - Auth
+  /api/v1/auth/logout:
     get:
       consumes:
       - application/json
-      description: Get the login user’s credentials.
+      description: Logout.
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: ok
           schema:
-            $ref: '#/definitions/model.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-      summary: Get user's credentials.
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Logout.
       tags:
-      - Me
-  /v1/refresh:
+      - Auth
+  /api/v1/auth/refresh:
     get:
       consumes:
       - application/json
@@ -209,57 +158,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.TokenResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-      summary: Request a new access token.
-      tags:
-      - Refresh
-  /v1/users:
-    get:
-      consumes:
-      - application/json
-      description: Get all exists users.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.User'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
+            $ref: '#/definitions/model.Token'
       security:
       - ApiKeyAuth: []
-      summary: Get all exists users.
+      summary: Request a new access token.
       tags:
-      - Users
+      - Auth
+  /api/v1/auth/register:
     post:
       consumes:
       - application/json
-      description: Create a new book.
+      description: Create a new user.
       parameters:
       - description: users infomation
         in: body
@@ -273,27 +182,34 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
+            $ref: '#/definitions/model.UserResponse'
       summary: Create a new user.
       tags:
-      - User
-  /v1/users/{id}:
+      - Auth
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get all exists users information.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserResponse'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get all exists users information.
+      tags:
+      - Users
+  /api/v1/users/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete user by given ID.
+      description: Delete user information by given ID.
       parameters:
       - description: id of the user
         in: path
@@ -307,25 +223,13 @@ paths:
           description: ok
           schema:
             type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-      summary: Delete user by given ID.
+      summary: Delete user information by given ID.
       tags:
-      - User
+      - Users
     get:
       consumes:
       - application/json
-      description: Get user by given ID.
+      description: Get user information by given ID.
       parameters:
       - description: id of the user
         in: path
@@ -338,26 +242,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-      summary: Get user by given ID.
+            $ref: '#/definitions/model.UserResponse'
+      summary: Get user information by given ID.
       tags:
-      - User
+      - Users
     patch:
       consumes:
       - application/json
-      description: Update user.
+      description: Update user information.
       parameters:
       - description: id of the user
         in: path
@@ -377,21 +269,26 @@ paths:
           description: ok
           schema:
             type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.HTTPError'
-      summary: Update user.
+      summary: Update user information.
       tags:
-      - User
+      - Users
+  /api/v1/users/me:
+    get:
+      consumes:
+      - application/json
+      description: Get my user information..
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get my user information.
+      tags:
+      - Users
 securityDefinitions:
   ApiKeyAuth:
     in: header

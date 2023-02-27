@@ -8,36 +8,35 @@ import (
 )
 
 func InsertUser(db *sql.DB, user *model.User) error {
-	stmt, err := db.Prepare("INSERT INTO users (uuid, id, email, name, birthDate, gender, password, qna_question, qna_answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO users (id, nick_name, email, name, birth_date, gender, password, qna_question, qna_answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, execErr := stmt.Exec(uuid.New(), user.ID, user.Email, user.Name, user.BirthDate, user.Gender, user.Password, user.QnA.Question, user.QnA.Answer)
+	_, execErr := stmt.Exec(uuid.New(), user.NickName, user.Email, user.Name, user.BirthDate, user.Gender, user.Password, user.QnA.Question, user.QnA.Answer)
 	return execErr
 }
 
-func SelectUsers(db *sql.DB) ([]model.User, error) {
-	rows, err := db.Query("SELECT uuid, id, email, name, birthDate, gender, password, qna_question, qna_answer, created_at, updated_at, deleted_at  FROM users")
+func SelectUsers(db *sql.DB) ([]model.UserResponse, error) {
+	rows, err := db.Query("SELECT id, nick_name, email, name, birth_date, gender, qna_question, qna_answer, created_at, updated_at, deleted_at  FROM users")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	users := []model.User{}
+	users := []model.UserResponse{}
 
 	for rows.Next() {
-		var user model.User
+		var user model.UserResponse
 		var getUUID uuid.UUID
 		scanErr := rows.Scan(
 			&getUUID,
-			&user.ID,
+			&user.NickName,
 			&user.Email,
 			&user.Name,
 			&user.BirthDate,
 			&user.Gender,
-			&user.Password,
 			&user.QnA.Question,
 			&user.QnA.Answer,
 			&user.CreatedAt,
@@ -46,41 +45,55 @@ func SelectUsers(db *sql.DB) ([]model.User, error) {
 		if scanErr != nil {
 			return nil, scanErr
 		}
-		user.UUID = getUUID.String()
+		user.ID = getUUID.String()
 		users = append(users, user)
 	}
 	return users, nil
 }
 
-func SelectUser(db *sql.DB, id string) (*model.User, error) {
-	var user model.User
+func SelectUserPassword(db *sql.DB, email string) (string, error) {
+	var password string
+	err := db.QueryRow("SELECT password FROM users WHERE email = ?", email).Scan(&password)
+	if err != nil {
+		return "", err
+	}
+	return password, nil
+}
+
+func SelectUserById(db *sql.DB, id string) (*model.UserResponse, error) {
+	var user model.UserResponse
 	var getUUID uuid.UUID
-	err := db.QueryRow("SELECT uuid, id, email, name, birthDate, gender, password, qna_question, qna_answer, created_at, updated_at, deleted_at FROM users WHERE id = ?", id).Scan(&getUUID, &user.ID, &user.Email, &user.Name, &user.BirthDate, &user.Gender, &user.Password, &user.QnA.Question, &user.QnA.Answer, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+	err := db.QueryRow("SELECT id, nick_name, email, name, birth_date, gender, qna_question, qna_answer, created_at, updated_at, deleted_at FROM users WHERE id = ?", id).Scan(&getUUID, &user.ID, &user.Email, &user.Name, &user.BirthDate, &user.Gender, &user.QnA.Question, &user.QnA.Answer, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
-	user.UUID = getUUID.String()
+	user.ID = getUUID.String()
 	return &user, nil
 }
 
-func UpdateUser(db *sql.DB, user *model.User) error {
-	stmt, err := db.Prepare("UPDATE users SET email = ?, name = ?, birthDate = ?, gender = ?, password = ?, qna_question = ?, qna_answer = ? WHERE id = ?")
+func SelectUserByEmail(db *sql.DB, email string) (*model.UserResponse, error) {
+	var user model.UserResponse
+	var getUUID uuid.UUID
+	err := db.QueryRow("SELECT id, nick_name, email, name, birth_date, gender, qna_question, qna_answer, created_at, updated_at, deleted_at FROM users WHERE email = ?", email).Scan(&getUUID, &user.ID, &user.Email, &user.Name, &user.BirthDate, &user.Gender, &user.QnA.Question, &user.QnA.Answer, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+	user.ID = getUUID.String()
+	return &user, nil
+}
+
+func UpdateUser(db *sql.DB, id string, user *model.User) error {
+	stmt, err := db.Prepare("UPDATE users SET email = ?, name = ?, birth_date = ?, gender = ?, password = ?, qna_question = ?, qna_answer = ? WHERE id = ?")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
 	/*result*/
-	_, execErr := stmt.Exec(user.Email, user.Name, user.BirthDate, user.Gender, user.Password, user.QnA.Question, user.QnA.Answer, user.ID)
+	_, execErr := stmt.Exec(user.Email, user.Name, user.BirthDate, user.Gender, user.Password, user.QnA.Question, user.QnA.Answer, id)
 	if execErr != nil {
 		return execErr
 	}
-
-	// cnt, affErr := result.RowsAffected()
-	// if affErr != nil {
-	// 	return affErr
-	// }
-
 	return nil
 }
 

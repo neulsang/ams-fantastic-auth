@@ -12,7 +12,7 @@ func Fiber(a *fiber.App) {
 		cors.New(cors.Config{
 			AllowOrigins:     "http://localhost:9090",
 			AllowHeaders:     "Origin, Content-Type, Accept",
-			AllowMethods:     "GET, POST",
+			AllowMethods:     "GET, POST, DELETE, PATCH",
 			AllowCredentials: true,
 		}),
 		// Add simple logger.

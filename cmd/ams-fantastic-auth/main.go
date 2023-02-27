@@ -55,9 +55,10 @@ func main() {
 		if initTableErr := schema.CreateUsersTable(db); initTableErr != nil {
 			log.Fatal(initTableErr)
 		}
-		if initTableErr := schema.CreateTokenTable(db); initTableErr != nil {
-			log.Fatal(initTableErr)
-		}
+		// Not Used
+		// if initTableErr := schema.CreateTokenTable(db); initTableErr != nil {
+		// 	log.Fatal(initTableErr)
+		// }
 	} else {
 		log.Fatal(dbErr)
 	}
@@ -69,7 +70,7 @@ func main() {
 
 	// Swagger
 	routes.Swagger(app)
-	routes.LoginApi(app)
+	routes.AuthApi(app)
 	routes.UserApi(app)
 
 	log.Fatal(app.Listen(":9090"))

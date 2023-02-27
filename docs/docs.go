@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "description": "Login.",
                 "consumes": [
@@ -34,7 +34,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Login"
+                    "Auth"
                 ],
                 "summary": "Login.",
                 "parameters": [
@@ -52,32 +52,14 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.TokenResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
+                            "$ref": "#/definitions/model.Token"
                         }
                     }
                 }
             }
         },
-        "/v1/logout/{tokon_uuid}": {
-            "delete": {
+        "/api/v1/auth/logout": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -91,89 +73,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Logout"
+                    "Auth"
                 ],
                 "summary": "Logout.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "uuid of the token",
-                        "name": "tokon_uuid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "ok",
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
                     }
                 }
             }
         },
-        "/v1/me": {
+        "/api/v1/auth/refresh": {
             "get": {
-                "description": "Get the login user’s credentials.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Me"
-                ],
-                "summary": "Get user's credentials.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
+                "security": [
+                    {
+                        "ApiKeyAuth": []
                     }
-                }
-            }
-        },
-        "/v1/refresh": {
-            "get": {
+                ],
                 "description": "Request a new access token.",
                 "consumes": [
                     "application/json"
@@ -182,87 +101,22 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Refresh"
+                    "Auth"
                 ],
                 "summary": "Request a new access token.",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.TokenResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
+                            "$ref": "#/definitions/model.Token"
                         }
                     }
                 }
             }
         },
-        "/v1/users": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get all exists users.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get all exists users.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.User"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    }
-                }
-            },
+        "/api/v1/auth/register": {
             "post": {
-                "description": "Create a new book.",
+                "description": "Create a new user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -270,7 +124,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Auth"
                 ],
                 "summary": "Create a new user.",
                 "parameters": [
@@ -288,33 +142,20 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
+                            "$ref": "#/definitions/model.UserResponse"
                         }
                     }
                 }
             }
         },
-        "/v1/users/{id}": {
+        "/api/v1/users": {
             "get": {
-                "description": "Get user by given ID.",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all exists users information.",
                 "consumes": [
                     "application/json"
                 ],
@@ -322,9 +163,63 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Users"
                 ],
-                "summary": "Get user by given ID.",
+                "summary": "Get all exists users information.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.UserResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/me": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get my user information..",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get my user information.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "description": "Get user information by given ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user information by given ID.",
                 "parameters": [
                     {
                         "type": "string",
@@ -338,31 +233,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
+                            "$ref": "#/definitions/model.UserResponse"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Delete user by given ID.",
+                "description": "Delete user information by given ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -370,9 +247,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Users"
                 ],
-                "summary": "Delete user by given ID.",
+                "summary": "Delete user information by given ID.",
                 "parameters": [
                     {
                         "type": "string",
@@ -388,29 +265,11 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
                     }
                 }
             },
             "patch": {
-                "description": "Update user.",
+                "description": "Update user information.",
                 "consumes": [
                     "application/json"
                 ],
@@ -418,9 +277,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Users"
                 ],
-                "summary": "Update user.",
+                "summary": "Update user information.",
                 "parameters": [
                     {
                         "type": "string",
@@ -445,24 +304,6 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HTTPError"
-                        }
                     }
                 }
             }
@@ -472,11 +313,10 @@ const docTemplate = `{
         "model.Login": {
             "type": "object",
             "properties": {
-                "id": {
+                "email": {
                     "type": "string",
-                    "maxLength": 36,
-                    "minLength": 1,
-                    "example": "dgkwon90"
+                    "maxLength": 255,
+                    "example": "dgkwon90@naver.com"
                 },
                 "password": {
                     "type": "string",
@@ -504,32 +344,56 @@ const docTemplate = `{
         "model.Token": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "expires_at": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.TokenResponse": {
-            "type": "object",
-            "properties": {
                 "access_token": {
-                    "$ref": "#/definitions/model.Token"
+                    "type": "string"
                 },
                 "refresh_token": {
-                    "$ref": "#/definitions/model.Token"
+                    "type": "string"
                 }
             }
         },
         "model.User": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string",
+                    "example": "1990-07-29"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "dgkwon90@naver.com"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        " female",
+                        " other"
+                    ],
+                    "example": "male"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "권대근"
+                },
+                "nick_name": {
+                    "type": "string",
+                    "maxLength": 36,
+                    "example": "dgkwon90"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "test1234"
+                },
+                "qna": {
+                    "$ref": "#/definitions/model.QnA"
+                }
+            }
+        },
+        "model.UserResponse": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -557,41 +421,23 @@ const docTemplate = `{
                     "example": "male"
                 },
                 "id": {
-                    "type": "string",
-                    "maxLength": 36,
-                    "example": "dgkwon90"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string",
                     "maxLength": 255,
                     "example": "권대근"
                 },
-                "password": {
+                "nick_name": {
                     "type": "string",
-                    "maxLength": 255,
-                    "example": "test1234"
+                    "maxLength": 36,
+                    "example": "dgkwon90"
                 },
                 "qna": {
                     "$ref": "#/definitions/model.QnA"
                 },
                 "updated_at": {
                     "type": "string"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.HTTPError": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer",
-                    "example": 400
-                },
-                "message": {
-                    "type": "string",
-                    "example": "status bad request"
                 }
             }
         }
