@@ -1,4 +1,3 @@
-basePath: /api
 definitions:
   model.Login:
     properties:
@@ -90,7 +89,6 @@ definitions:
         example: status bad request
         type: string
     type: object
-host: localhost:9090
 info:
   contact:
     email: dgkwon90@gmail.com

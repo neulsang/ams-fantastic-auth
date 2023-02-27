@@ -20,7 +20,6 @@ var (
 )
 
 func buildInfoPrint() {
-	// default log
 	log.Printf("Build Information : %v at %v\n", GitCommit, BuildTime)
 	log.Println("Started at :", time.Now().Format(time.RFC3339))
 }
@@ -28,20 +27,15 @@ func buildInfoPrint() {
 // @title AMS Fantastic Auth Swagger API
 // @version 1.0
 // @description This is a Test auth api server
-
 // @termsOfService http://swagger.io/terms/
-
 // @contact.name API Support
 // @contact.url https://github.com/neulsang
 // @contact.email dgkwon90@gmail.com
-
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-
 // @host localhost:9090
 // @BasePath /api
 func main() {
@@ -66,7 +60,6 @@ func main() {
 		}
 	} else {
 		log.Fatal(dbErr)
-		//log.Println(dbErr)
 	}
 
 	app := fiber.New(fiberConfig)

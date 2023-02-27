@@ -84,7 +84,7 @@ func Login(c *fiber.Ctx) error {
 
 	// return c.JSON(tokenRes)
 
-	accessJwtExpiresIn := time.Minute * 1
+	accessJwtExpiresIn := time.Minute * 3
 	accessJwtSercret := "AmsAccessJwtSecret"
 	accessJwtMaxAge := 60
 
@@ -93,7 +93,7 @@ func Login(c *fiber.Ctx) error {
 		return response.NewError(c, fiber.StatusBadGateway, fmt.Sprintf("generating JWT Token failed: %v", signErr))
 	}
 
-	refreshJwtExpiresIn := time.Minute * 1
+	refreshJwtExpiresIn := time.Minute * 5
 	refreshJwtSercret := "AmsRefreshJwtSecret"
 	refreshJwtMaxAge := 60
 
@@ -101,6 +101,16 @@ func Login(c *fiber.Ctx) error {
 	if signErr != nil {
 		return response.NewError(c, fiber.StatusBadGateway, fmt.Sprintf("generating JWT Token failed: %v", signErr))
 	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "logged_in",
+		Value:    "true",
+		Path:     "/",
+		MaxAge:   accessJwtMaxAge * 60,
+		Secure:   false,
+		HTTPOnly: false,
+		Domain:   "localhost",
+	})
 
 	c.Cookie(&fiber.Cookie{
 		Name:     "access_token",
@@ -119,16 +129,6 @@ func Login(c *fiber.Ctx) error {
 		MaxAge:   refreshJwtMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: true,
-		Domain:   "localhost",
-	})
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "logged_in",
-		Value:    "true",
-		Path:     "/",
-		MaxAge:   accessJwtMaxAge * 60,
-		Secure:   false,
-		HTTPOnly: false,
 		Domain:   "localhost",
 	})
 
@@ -183,13 +183,13 @@ func Logout(c *fiber.Ctx) error {
 		Expires: expired,
 	})
 	c.Cookie(&fiber.Cookie{
-		Name:    "logged_in",
-		Value:   "false",
+		Name:    "refresh_token",
+		Value:   "",
 		Expires: expired,
 	})
 	c.Cookie(&fiber.Cookie{
-		Name:    "refresh_token",
-		Value:   "",
+		Name:    "logged_in",
+		Value:   "false",
 		Expires: expired,
 	})
 	return c.SendStatus(fiber.StatusOK)
@@ -273,7 +273,7 @@ func Refresh(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": "the user belonging to this token no logger exists"})
 	}
 
-	accessJwtExpiresIn := time.Minute * 1
+	accessJwtExpiresIn := time.Minute * 3
 	accessJwtSercret := "AmsAccessJwtSecret"
 	accessJwtMaxAge := 60
 
@@ -283,22 +283,22 @@ func Refresh(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&fiber.Cookie{
-		Name:     "access_token",
-		Value:    accessToken,
-		Path:     "/",
-		MaxAge:   accessJwtMaxAge * 60,
-		Secure:   false,
-		HTTPOnly: true,
-		Domain:   "localhost",
-	})
-
-	c.Cookie(&fiber.Cookie{
 		Name:     "logged_in",
 		Value:    "true",
 		Path:     "/",
 		MaxAge:   accessJwtMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: false,
+		Domain:   "localhost",
+	})
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		MaxAge:   accessJwtMaxAge * 60,
+		Secure:   false,
+		HTTPOnly: true,
 		Domain:   "localhost",
 	})
 

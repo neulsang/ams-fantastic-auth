@@ -15,8 +15,6 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:9090",
-    "basePath": "/api",
     "paths": {
         "/v1/login": {
             "post": {

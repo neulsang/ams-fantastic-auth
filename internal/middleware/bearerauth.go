@@ -219,7 +219,7 @@ func BearerAuthReq2(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": "the user belonging to this token no logger exists"})
 	}
 
-	c.Locals("user", user)
+	c.Locals("user", *user)
 
 	// Continue with the request chain if the token is valid
 	return c.Next()

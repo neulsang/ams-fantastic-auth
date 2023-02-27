@@ -1,8 +1,6 @@
 package jwt
 
 import (
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -14,7 +12,7 @@ func GenerateNewToken(expiresIn time.Duration, privateKey, userID string) (strin
 	secret := privateKey
 
 	// Set expires minutes count for secret key from .env file.
-	minutesCount, _ := strconv.Atoi(os.Getenv("JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT"))
+	minutesCount := expiresIn
 
 	// Create a new claims.
 	claims := jwt.MapClaims{}
