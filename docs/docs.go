@@ -345,10 +345,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "access_token": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "{uuid}"
                 },
                 "refresh_token": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "{uuid}"
                 }
             }
         },
@@ -401,10 +403,12 @@ const docTemplate = `{
                     "example": "1990-07-29"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2023-02-27 17:03:20"
                 },
                 "deleted_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2023-02-27 17:03:20"
                 },
                 "email": {
                     "type": "string",
@@ -421,7 +425,8 @@ const docTemplate = `{
                     "example": "male"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "{uuid}"
                 },
                 "name": {
                     "type": "string",
@@ -437,7 +442,8 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.QnA"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2023-02-27 17:03:20"
                 }
             }
         }

@@ -25,8 +25,10 @@ definitions:
   model.Token:
     properties:
       access_token:
+        example: '{uuid}'
         type: string
       refresh_token:
+        example: '{uuid}'
         type: string
     type: object
   model.User:
@@ -66,8 +68,10 @@ definitions:
         example: "1990-07-29"
         type: string
       created_at:
+        example: "2023-02-27 17:03:20"
         type: string
       deleted_at:
+        example: "2023-02-27 17:03:20"
         type: string
       email:
         example: dgkwon90@naver.com
@@ -81,6 +85,7 @@ definitions:
         example: male
         type: string
       id:
+        example: '{uuid}'
         type: string
       name:
         example: 권대근
@@ -93,6 +98,7 @@ definitions:
       qna:
         $ref: '#/definitions/model.QnA'
       updated_at:
+        example: "2023-02-27 17:03:20"
         type: string
     type: object
 info:

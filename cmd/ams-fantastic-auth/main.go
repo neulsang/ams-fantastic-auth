@@ -36,7 +36,6 @@ func buildInfoPrint() {
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-// @host localhost:9090
 // @BasePath /api
 func main() {
 	buildInfoPrint()

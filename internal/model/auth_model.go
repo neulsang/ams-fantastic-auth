@@ -6,6 +6,6 @@ type Login struct {
 }
 
 type Token struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"access_token" example:"{uuid}"`
+	RefreshToken string `json:"refresh_token" example:"{uuid}"`
 }
