@@ -10,10 +10,7 @@ func Fiber(a *fiber.App) {
 	a.Use(
 		// Add CORS to each route.
 		cors.New(cors.Config{
-			AllowOrigins:     "*",
-			AllowHeaders:     "Origin, Content-Type, Accept",
-			AllowMethods:     "GET, POST, DELETE, PATCH",
-			AllowCredentials: true,
+			AllowOrigins: "http://devhong.asuscomm.com:15173",
 		}),
 		// Add simple logger.
 		logger.New(),
