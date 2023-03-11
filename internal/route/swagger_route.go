@@ -1,4 +1,4 @@
-package routes
+package route
 
 import (
 	_ "ams-fantastic-auth/docs"
@@ -8,7 +8,7 @@ import (
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
-func Swagger(app *fiber.App) {
+func AddSwaggerRotue(app *fiber.App) {
 	route := app.Group("/swagger")
 	route.Get("*", fiberSwagger.WrapHandler)
 }

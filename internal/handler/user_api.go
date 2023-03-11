@@ -1,15 +1,30 @@
-package handlers
+package handler
 
 import (
-	"ams-fantastic-auth/internal/configs"
 	"ams-fantastic-auth/internal/database"
+	"ams-fantastic-auth/internal/middleware"
 	"ams-fantastic-auth/internal/model"
 	"ams-fantastic-auth/internal/response"
+	"ams-fantastic-auth/pkg/jwttool"
 	"ams-fantastic-auth/pkg/password"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+type UserAPI struct {
+	db           *database.Database
+	accessToken  *jwttool.Token
+	refreshToken *jwttool.Token
+}
+
+func NewUser(db *database.Database, middleJwtAuth *middleware.JWTAuth) *UserAPI {
+	return &UserAPI{
+		db:           db,
+		accessToken:  middleJwtAuth.AccessToken(),
+		refreshToken: middleJwtAuth.RefreshToken(),
+	}
+}
 
 // Me
 //
@@ -21,10 +36,10 @@ import (
 // @Success 200 {object} model.UserResponse
 // @Security ApiKeyAuth
 // @Router /api/v1/users/me [get]
-func Me(c *fiber.Ctx) error {
+func (u *UserAPI) Me(c *fiber.Ctx) error {
 	var user model.UserResponse
 	if c.Locals("user") == nil {
-		return response.NewError(c, fiber.StatusNoContent, "data is nil")
+		return response.UserError(c, fiber.StatusNoContent, response.UserNotFoundUserErrorCode, "")
 	}
 
 	user = c.Locals("user").(model.UserResponse)
@@ -41,22 +56,17 @@ func Me(c *fiber.Ctx) error {
 // @Success 200 {array} model.UserResponse
 // @Security ApiKeyAuth
 // @Router /api/v1/users [get]
-func GetUsers(c *fiber.Ctx) error {
-	db, newErr := database.New(configs.Database())
-	if newErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
-	}
-
-	users, selectErr := database.SelectUsers(db)
+func (u *UserAPI) GetUsers(c *fiber.Ctx) error {
+	users, selectErr := database.SelectUsers(u.db.Connect())
 	if selectErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, selectErr.Error())
+		return response.UserError(c, fiber.StatusInternalServerError, response.UserSelectFailErrorCode, selectErr.Error())
 	}
 
 	if users == nil {
-		return response.NewError(c, fiber.StatusNoContent, "data is nil")
+		return response.UserError(c, fiber.StatusNoContent, response.UserNotFoundUserErrorCode, "")
 	}
 
-	return c.JSON(users)
+	return c.Status(fiber.StatusOK).JSON(users)
 }
 
 // GetUser
@@ -69,28 +79,23 @@ func GetUsers(c *fiber.Ctx) error {
 // @Param id path string true "id of the user"
 // @Success 200 {object} model.UserResponse
 // @Router /api/v1/users/{id} [get]
-func GetUser(c *fiber.Ctx) error {
+func (u *UserAPI) GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
-		return response.NewError(c, fiber.StatusBadRequest, "id is nil")
+		return response.UserError(c, fiber.StatusBadRequest, response.UserReqParamErrorCode, "")
 	}
 	log.Println("path id: ", id)
 
-	db, newErr := database.New(configs.Database())
-	if newErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
-	}
-
-	user, selectErr := database.SelectUserById(db, id)
+	user, selectErr := database.SelectUserById(u.db.Connect(), id)
 	if selectErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, selectErr.Error())
+		return response.UserError(c, fiber.StatusInternalServerError, response.UserSelectFailErrorCode, selectErr.Error())
 	}
 
 	if user == nil {
-		return response.NewError(c, fiber.StatusNoContent, "data is nil")
+		return response.UserError(c, fiber.StatusNoContent, response.UserNotFoundUserErrorCode, "")
 	}
 
-	return c.JSON(user)
+	return c.Status(fiber.StatusOK).JSON(user)
 }
 
 // UpdateUser
@@ -102,18 +107,18 @@ func GetUser(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path string true "id of the user"
 // @Param user body  model.User true "users infomation"
-// @Success 201 {string} status "ok"
+// @Success 200 {string} status "ok"
 // @Router /api/v1/users/{id} [patch]
-func UpdateUser(c *fiber.Ctx) error {
+func (u *UserAPI) UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
-		return response.NewError(c, fiber.StatusBadRequest, "id is nil")
+		return response.UserError(c, fiber.StatusBadRequest, response.UserReqParamErrorCode, "")
 	}
 	log.Println("path id: ", id)
 
 	user := new(model.User)
 	if parseErr := c.BodyParser(user); parseErr != nil {
-		return response.NewError(c, fiber.StatusBadRequest, parseErr.Error())
+		return response.UserError(c, fiber.StatusBadRequest, response.UserBodyParseErrorCode, parseErr.Error())
 	}
 
 	log.Printf("email: %v", user.Email)
@@ -121,26 +126,21 @@ func UpdateUser(c *fiber.Ctx) error {
 	log.Printf("birtDate: %v", user.BirthDate)
 	log.Printf("gender: %v", user.Gender)
 	log.Printf("password: %v", user.Password)
-	log.Printf("qna question: %v", user.QnA.Question)
-	log.Printf("qna answer: %v", user.QnA.Answer)
+	log.Printf("qna question: %v", user.Qna.Question)
+	log.Printf("qna answer: %v", user.Qna.Answer)
 
 	genPassword, genErr := password.Generate(user.Password)
 	if genErr != nil {
-		return response.NewError(c, fiber.StatusBadRequest, genErr.Error())
+		return response.UserError(c, fiber.StatusBadRequest, response.UserPasswordGenerateErrorCode, genErr.Error())
 	}
 	user.Password = genPassword
 
-	db, newErr := database.New(configs.Database())
-	if newErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
-	}
-
-	updateErr := database.UpdateUser(db, id, user)
+	updateErr := database.UpdateUser(u.db.Connect(), id, user)
 	if updateErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, updateErr.Error())
+		return response.UserError(c, fiber.StatusInternalServerError, response.UserUpdateFailErrorCode, updateErr.Error())
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).SendString("ok")
 }
 
 // DeleteUser
@@ -153,23 +153,18 @@ func UpdateUser(c *fiber.Ctx) error {
 // @Param id path string true "id of the user"
 // @Success 204 {string} status "ok"
 // @Router /api/v1/users/{id} [delete]
-func DeleteUser(c *fiber.Ctx) error {
+func (u *UserAPI) DeleteUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if len(id) <= 0 {
-		return response.NewError(c, fiber.StatusBadRequest, "id is nil")
+		return response.UserError(c, fiber.StatusBadRequest, response.UserReqParamErrorCode, "")
 	}
 	log.Println("path id: ", id)
 
-	db, newErr := database.New(configs.Database())
-	if newErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, newErr.Error())
-	}
-
-	updateErr := database.DeleteUser(db, id)
-	if updateErr != nil {
-		return response.NewError(c, fiber.StatusInternalServerError, updateErr.Error())
+	deleteErr := database.DeleteUser(u.db.Connect(), id)
+	if deleteErr != nil {
+		return response.UserError(c, fiber.StatusInternalServerError, response.UseDeleteFailErrorCode, deleteErr.Error())
 	}
 
 	// Return status 204 no content.
-	return c.SendStatus(fiber.StatusNoContent)
+	return c.Status(fiber.StatusNoContent).SendString("ok")
 }

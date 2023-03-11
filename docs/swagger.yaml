@@ -1,5 +1,5 @@
 definitions:
-  model.Login:
+  model.LoginRequest:
     properties:
       email:
         example: dgkwon90@naver.com
@@ -11,7 +11,47 @@ definitions:
         minLength: 8
         type: string
     type: object
-  model.QnA:
+  model.LoginResponse:
+    properties:
+      accessToken:
+        example: '{uuid}'
+        type: string
+      birthDate:
+        example: "2000-01-01"
+        type: string
+      email:
+        example: dgkwon90@naver.com
+        maxLength: 255
+        type: string
+      gender:
+        enum:
+        - male
+        - ' female'
+        - ' other'
+        example: male
+        type: string
+      id:
+        example: '{uuid}'
+        type: string
+      name:
+        example: 권댜군
+        maxLength: 255
+        type: string
+      nickName:
+        example: 늘상
+        maxLength: 36
+        type: string
+      phoneNumber:
+        example: "01012344321"
+        maxLength: 20
+        type: string
+      qna:
+        $ref: '#/definitions/model.Qna'
+      refreshToken:
+        example: '{uuid}'
+        type: string
+    type: object
+  model.Qna:
     properties:
       answer:
         example: blue
@@ -22,14 +62,49 @@ definitions:
         maxLength: 255
         type: string
     type: object
-  model.Token:
+  model.RefreshResponse:
     properties:
-      access_token:
+      accessToken:
         example: '{uuid}'
         type: string
-      refresh_token:
+      refreshToken:
         example: '{uuid}'
         type: string
+    type: object
+  model.RegisterRequest:
+    properties:
+      birthDate:
+        example: "2000-01-01"
+        type: string
+      email:
+        example: test@clobot.com
+        maxLength: 255
+        type: string
+      gender:
+        enum:
+        - male
+        - ' female'
+        - ' other'
+        example: male
+        type: string
+      name:
+        example: tester
+        maxLength: 255
+        type: string
+      nickName:
+        example: tester
+        maxLength: 36
+        type: string
+      password:
+        example: test1234
+        maxLength: 255
+        type: string
+      phoneNumber:
+        example: "01012344321"
+        maxLength: 20
+        type: string
+      qna:
+        $ref: '#/definitions/model.Qna'
     type: object
   model.User:
     properties:
@@ -51,7 +126,7 @@ definitions:
         example: 권대근
         maxLength: 255
         type: string
-      nick_name:
+      nickName:
         example: dgkwon90
         maxLength: 36
         type: string
@@ -59,8 +134,12 @@ definitions:
         example: test1234
         maxLength: 255
         type: string
+      phoneNumber:
+        example: "01012344321"
+        maxLength: 20
+        type: string
       qna:
-        $ref: '#/definitions/model.QnA'
+        $ref: '#/definitions/model.Qna'
     type: object
   model.UserResponse:
     properties:
@@ -91,12 +170,16 @@ definitions:
         example: 권대근
         maxLength: 255
         type: string
-      nick_name:
+      nickName:
         example: dgkwon90
         maxLength: 36
         type: string
+      phoneNumber:
+        example: "01012344321"
+        maxLength: 20
+        type: string
       qna:
-        $ref: '#/definitions/model.QnA'
+        $ref: '#/definitions/model.Qna'
       updated_at:
         example: "2023-02-27 17:03:20"
         type: string
@@ -125,14 +208,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.Login'
+          $ref: '#/definitions/model.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Token'
+            $ref: '#/definitions/model.LoginResponse'
       summary: Login.
       tags:
       - Auth
@@ -164,7 +247,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Token'
+            $ref: '#/definitions/model.RefreshResponse'
       security:
       - ApiKeyAuth: []
       summary: Request a new access token.
@@ -181,14 +264,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: ok
           schema:
-            $ref: '#/definitions/model.UserResponse'
+            type: string
       summary: Create a new user.
       tags:
       - Auth
@@ -271,7 +354,7 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
+        "200":
           description: ok
           schema:
             type: string

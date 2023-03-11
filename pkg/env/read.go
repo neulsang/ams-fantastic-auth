@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func Get(key string, defaultVal string) string {
+func ReadAsStr(key string, defaultVal string) string {
 	if val, ok := os.LookupEnv(key); ok {
 		return val
 	}
@@ -13,8 +13,8 @@ func Get(key string, defaultVal string) string {
 	return defaultVal
 }
 
-func GetAsInt(key string, defaultVal int) int {
-	strVal := Get(key, "")
+func ReadAsInt(key string, defaultVal int) int {
+	strVal := ReadAsStr(key, "")
 
 	if val, err := strconv.Atoi(strVal); err == nil {
 		return val

@@ -1,7 +1,8 @@
 package database
 
 import (
-	"ams-fantastic-auth/internal/configs"
+	"ams-fantastic-auth/internal/config"
+	"ams-fantastic-auth/internal/database/schema"
 	"database/sql"
 
 	"fmt"
@@ -10,12 +11,20 @@ import (
 	_ "github.com/go-sql-driver/mysql" //초기화를 위해 필요함
 )
 
-func dsn(config configs.DBConfig) string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s", config.UserName, config.Password, config.HostName, config.DBName)
+// Shutdown Functions
+type Shutdown func() error
+
+type Database struct {
+	connDB   *sql.DB
+	Shutdown Shutdown
 }
 
-func New(config configs.DBConfig) (*sql.DB, error) {
-	connDsn := dsn(config)
+func dsn(cfg *config.RDB) string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DatabaseName)
+}
+
+func Open(cfg *config.RDB) (*Database, error) {
+	connDsn := dsn(cfg)
 	log.Println("dns: ", connDsn)
 
 	db, err := sql.Open("mysql", connDsn)
@@ -27,5 +36,20 @@ func New(config configs.DBConfig) (*sql.DB, error) {
 		log.Printf("Error %s when ping DB\n", err)
 		return nil, pingErr
 	}
-	return db, nil
+	return &Database{
+		connDB:   db,
+		Shutdown: db.Close,
+	}, nil
+}
+
+func (d *Database) InitTables() error {
+	// schema Init
+	if err := schema.CreateUsersTable(d.connDB); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Database) Connect() *sql.DB {
+	return d.connDB
 }

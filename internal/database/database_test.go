@@ -1,16 +1,23 @@
 package database_test
 
 import (
-	"ams-fantastic-auth/internal/configs"
+	"ams-fantastic-auth/internal/config"
 	"ams-fantastic-auth/internal/database"
+	"fmt"
 	"testing"
+	"time"
 )
 
 func TestNewDB(t *testing.T) {
-	dbConfig := configs.Database()
-	db, err := database.New(dbConfig)
+
+	dbConfig := new(config.RDB)
+	dbConfig.LoadConfig()
+	db, err := database.Open(dbConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	db.Shutdown()
+
+	fmt.Println("wait 5 sec")
+	time.Sleep(time.Second * 5)
 }

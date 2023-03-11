@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Login"
+                            "$ref": "#/definitions/model.LoginRequest"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Token"
+                            "$ref": "#/definitions/model.LoginResponse"
                         }
                     }
                 }
@@ -108,7 +108,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Token"
+                            "$ref": "#/definitions/model.RefreshResponse"
                         }
                     }
                 }
@@ -134,15 +134,15 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.RegisterRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/model.UserResponse"
+                            "type": "string"
                         }
                     }
                 }
@@ -299,7 +299,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "ok",
                         "schema": {
                             "type": "string"
@@ -310,7 +310,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.Login": {
+        "model.LoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -326,7 +326,60 @@ const docTemplate = `{
                 }
             }
         },
-        "model.QnA": {
+        "model.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                    "example": "{uuid}"
+                },
+                "birthDate": {
+                    "type": "string",
+                    "example": "2000-01-01"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "dgkwon90@naver.com"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        " female",
+                        " other"
+                    ],
+                    "example": "male"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "{uuid}"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "권댜군"
+                },
+                "nickName": {
+                    "type": "string",
+                    "maxLength": 36,
+                    "example": "늘상"
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "01012344321"
+                },
+                "qna": {
+                    "$ref": "#/definitions/model.Qna"
+                },
+                "refreshToken": {
+                    "type": "string",
+                    "example": "{uuid}"
+                }
+            }
+        },
+        "model.Qna": {
             "type": "object",
             "properties": {
                 "answer": {
@@ -341,16 +394,62 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Token": {
+        "model.RefreshResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string",
                     "example": "{uuid}"
                 },
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string",
                     "example": "{uuid}"
+                }
+            }
+        },
+        "model.RegisterRequest": {
+            "type": "object",
+            "properties": {
+                "birthDate": {
+                    "type": "string",
+                    "example": "2000-01-01"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "test@clobot.com"
+                },
+                "gender": {
+                    "type": "string",
+                    "enum": [
+                        "male",
+                        " female",
+                        " other"
+                    ],
+                    "example": "male"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "tester"
+                },
+                "nickName": {
+                    "type": "string",
+                    "maxLength": 36,
+                    "example": "tester"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "test1234"
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "01012344321"
+                },
+                "qna": {
+                    "$ref": "#/definitions/model.Qna"
                 }
             }
         },
@@ -380,7 +479,7 @@ const docTemplate = `{
                     "maxLength": 255,
                     "example": "권대근"
                 },
-                "nick_name": {
+                "nickName": {
                     "type": "string",
                     "maxLength": 36,
                     "example": "dgkwon90"
@@ -390,8 +489,13 @@ const docTemplate = `{
                     "maxLength": 255,
                     "example": "test1234"
                 },
+                "phoneNumber": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "01012344321"
+                },
                 "qna": {
-                    "$ref": "#/definitions/model.QnA"
+                    "$ref": "#/definitions/model.Qna"
                 }
             }
         },
@@ -433,13 +537,18 @@ const docTemplate = `{
                     "maxLength": 255,
                     "example": "권대근"
                 },
-                "nick_name": {
+                "nickName": {
                     "type": "string",
                     "maxLength": 36,
                     "example": "dgkwon90"
                 },
+                "phoneNumber": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "example": "01012344321"
+                },
                 "qna": {
-                    "$ref": "#/definitions/model.QnA"
+                    "$ref": "#/definitions/model.Qna"
                 },
                 "updated_at": {
                     "type": "string",

@@ -1,12 +1,17 @@
 package main
 
 import (
-	"ams-fantastic-auth/internal/configs"
+	"ams-fantastic-auth/internal/config"
 	"ams-fantastic-auth/internal/database"
-	"ams-fantastic-auth/internal/database/schema"
 	"ams-fantastic-auth/internal/middleware"
-	"ams-fantastic-auth/internal/routes"
+	"ams-fantastic-auth/internal/route"
+	"ams-fantastic-auth/internal/server"
+	"ams-fantastic-auth/pkg/beautiprint"
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,12 +22,9 @@ var (
 	// GitCommit, BuildTime, Get infos at build time the golang.
 	GitCommit string
 	BuildTime string
-)
 
-func buildInfoPrint() {
-	log.Printf("Build Information : %v at %v\n", GitCommit, BuildTime)
-	log.Println("Started at :", time.Now().Format(time.RFC3339))
-}
+	shutdowns []func() error
+)
 
 // @title AMS Fantastic Auth Swagger API
 // @version 1.0
@@ -38,39 +40,86 @@ func buildInfoPrint() {
 // @name Authorization
 // @BasePath /api
 func main() {
+
+	// Print build information to the console.
 	buildInfoPrint()
+
+	// Print Logo to the console.
+	beautiprint.Logo("AMS Fantastic-Auth")
+
+	// Load env file .
 	err := godotenv.Load()
 	if err != nil {
 		log.Printf("could not load .env file: %v", err)
 	}
 
-	// Define Fiber fiberConfig.
-	fiberConfig := configs.Fiber()
-	// Define Database DatabaseConfig.
-	databaseConfig := configs.Database()
+	// Load Config
+	var (
+		cfg      = config.LoadConfig()
+		shutdown = make(chan struct{})
+	)
+
+	log.Println("server: ", cfg.Server())
+	log.Println("logger: ", cfg.Logger())
+	log.Println("rdb: ", cfg.RDB())
+	log.Println("jwt: ", cfg.JWT())
 
 	// database init.
-	if db, dbErr := database.New(databaseConfig); dbErr == nil {
-		if initTableErr := schema.CreateUsersTable(db); initTableErr != nil {
-			log.Fatal(initTableErr)
+	db, dbErr := database.Open(cfg.RDB())
+	if dbErr == nil {
+		if initTablesErr := db.InitTables(); initTablesErr != nil {
+			log.Fatal(initTablesErr)
 		}
-		// Not Used
-		// if initTableErr := schema.CreateTokenTable(db); initTableErr != nil {
-		// 	log.Fatal(initTableErr)
-		// }
 	} else {
 		log.Fatal(dbErr)
 	}
 
-	app := fiber.New(fiberConfig)
+	// new middleTwtAuth
+	middleJwtAuth := middleware.New(db, cfg.JWT())
 
-	// Middlewares.
-	middleware.Fiber(app)
+	authServer := server.New(cfg.Server())
 
-	// Swagger
-	routes.Swagger(app)
-	routes.AuthApi(app)
-	routes.UserApi(app)
+	route.AddSwaggerRotue(authServer)
+	route.AddAuthRoute(authServer, db, middleJwtAuth)
+	route.AddUserRoute(authServer, db, middleJwtAuth)
 
-	log.Fatal(app.Listen(":9090"))
+	shutdowns = append(shutdowns, db.Shutdown)
+
+	go gracefulShutdown(authServer, shutdown)
+
+	if err := authServer.Listen(fmt.Sprintf(":%v", cfg.Server().Port)); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func buildInfoPrint() {
+	log.Printf("Build Information : %v at %v\n", GitCommit, BuildTime)
+	log.Println("Started at :", time.Now().Format(time.RFC3339))
+}
+
+func gracefulShutdown(server *fiber.App, shutdown chan struct{}) {
+	var (
+		sigint = make(chan os.Signal, 1)
+	)
+
+	signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
+	s := <-sigint
+
+	// defalut log
+	log.Println("got system signal:", s)
+	log.Println("shutting down server gracefully")
+
+	if err := server.Shutdown(); err != nil {
+		log.Println("shutdown err: ", err)
+	}
+
+	log.Println("shutdown server success")
+
+	log.Println("shutting down other modules")
+	// close any other modules.
+	for i := range shutdowns {
+		shutdowns[i]()
+	}
+	log.Println("shutdown other modules success")
+	close(shutdown)
 }
