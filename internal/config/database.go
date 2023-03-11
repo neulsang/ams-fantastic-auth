@@ -3,11 +3,11 @@ package config
 import "ams-fantastic-auth/pkg/env"
 
 type RDB struct {
-	Host         string `mapstructure:"RDB_HOST"`
-	Port         int    `mapstructure:"RDB_PORT"`
-	Username     string `mapstructure:"RDB_USER_NAME"`
-	Password     string `mapstructure:"RDB_PASSWORD"`
-	DatabaseName string `mapstructure:"RDB_DB_NAME"`
+	Host         string //`mapstructure:"RDB_HOST"`
+	Port         int    //`mapstructure:"RDB_PORT"`
+	Username     string //`mapstructure:"RDB_USER_NAME"`
+	Password     string //`mapstructure:"RDB_PASSWORD"`
+	DatabaseName string //`mapstructure:"RDB_DB_NAME"`
 }
 
 func (r *RDB) LoadConfig() {

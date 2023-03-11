@@ -3,10 +3,10 @@ package config
 import "ams-fantastic-auth/pkg/env"
 
 type Server struct {
-	Host        string `mapstructure:"SERVER_HOST"`
-	Port        int    `mapstructure:"SERVER_PORT"`
-	Origin      string `mapstructure:"SERVER_ORIGIN"`
-	ReadTimeout int    `mapstructure:"SERVER_READ_TIMEOUT"`
+	Host        string //`mapstructure:"SERVER_HOST"`
+	Port        int    //`mapstructure:"SERVER_PORT"`
+	Origin      string //`mapstructure:"SERVER_ORIGIN"`
+	ReadTimeout int    //`mapstructure:"SERVER_READ_TIMEOUT"`
 }
 
 func (s *Server) LoadConfig() {

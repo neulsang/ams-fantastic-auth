@@ -3,14 +3,14 @@ package config
 import "ams-fantastic-auth/pkg/env"
 
 type JWT struct {
-	AccessTokenSecretKey  string `mapstructure:"JWT_ACCESS_TOKEN_SECRET_KEY"`
-	AccessTokenPublicKey  string `mapstructure:"JWT_ACCESS_TOKEN_PUBLIC_KEY"`
-	AccessTokenExpiredIn  int    `mapstructure:"JWT_ACCESS_TOKEN_EXPIRED_IN"`
-	AccessTokenMaxage     int    `mapstructure:"JWT_ACCESS_TOKEN_MAXAGE"`
-	RefreshTokenSecretKey string `mapstructure:"JWT_REFRESH_TOKEN_SECRET_KEY"`
-	RefreshTokenPublicKey string `mapstructure:"JWT_REFRESH_TOKEN_PUBLIC_KEY"`
-	RefreshTokenExpiredIn int    `mapstructure:"JWT_REFRESH_TOKEN_EXPIRED_IN"`
-	RefreshTokenMaxage    int    `mapstructure:"JWT_REFRESH_TOKEN_MAXAGE"`
+	AccessTokenSecretKey  string //`mapstructure:"JWT_ACCESS_TOKEN_SECRET_KEY"`
+	AccessTokenPublicKey  string //`mapstructure:"JWT_ACCESS_TOKEN_PUBLIC_KEY"`
+	AccessTokenExpiredIn  int    //`mapstructure:"JWT_ACCESS_TOKEN_EXPIRED_IN"`
+	AccessTokenMaxage     int    //`mapstructure:"JWT_ACCESS_TOKEN_MAXAGE"`
+	RefreshTokenSecretKey string //`mapstructure:"JWT_REFRESH_TOKEN_SECRET_KEY"`
+	RefreshTokenPublicKey string //`mapstructure:"JWT_REFRESH_TOKEN_PUBLIC_KEY"`
+	RefreshTokenExpiredIn int    //`mapstructure:"JWT_REFRESH_TOKEN_EXPIRED_IN"`
+	RefreshTokenMaxage    int    //`mapstructure:"JWT_REFRESH_TOKEN_MAXAGE"`
 }
 
 func (j *JWT) LoadConfig() {

@@ -1,7 +1,10 @@
 package config
 
 import (
+	"log"
 	"sync"
+
+	"github.com/joho/godotenv"
 )
 
 var once sync.Once
@@ -14,6 +17,13 @@ type Root struct {
 }
 
 func LoadConfig() *Root {
+	// Load env file .
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("could not load .env file: %v", err)
+	}
+
+	// LoadConfig
 	root := new(Root)
 	once.Do(func() {
 		serverConfig := new(Server)

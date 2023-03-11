@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -46,12 +45,6 @@ func main() {
 
 	// Print Logo to the console.
 	beautiprint.Logo("AMS Fantastic-Auth")
-
-	// Load env file .
-	err := godotenv.Load()
-	if err != nil {
-		log.Printf("could not load .env file: %v", err)
-	}
 
 	// Load Config
 	var (

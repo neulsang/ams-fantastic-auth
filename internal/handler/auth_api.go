@@ -144,7 +144,7 @@ func (a *AuthAPI) Login(c *fiber.Ctx) error {
 		Name:     "refresh_token",
 		Value:    refreshToken,
 		Path:     "/",
-		MaxAge:   a.accessToken.Maxage * 60,
+		MaxAge:   a.refreshToken.Maxage * 60,
 		Secure:   false,
 		HTTPOnly: true,
 		Domain:   "localhost",
@@ -246,6 +246,11 @@ func (a *AuthAPI) Refresh(c *fiber.Ctx) error {
 		return response.AuthError(c, fiber.StatusBadGateway, response.AuthTokenGenerateErrorCode, signErr.Error())
 	}
 
+	refreshToken, signErr = a.refreshToken.GenerateNewToken(user.Email)
+	if signErr != nil {
+		return response.AuthError(c, fiber.StatusBadGateway, response.AuthTokenGenerateErrorCode, signErr.Error())
+	}
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "logged_in",
 		Value:    "true",
@@ -266,6 +271,15 @@ func (a *AuthAPI) Refresh(c *fiber.Ctx) error {
 		Domain:   "localhost",
 	})
 
+	c.Cookie(&fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		MaxAge:   a.refreshToken.Maxage * 60,
+		Secure:   false,
+		HTTPOnly: true,
+		Domain:   "localhost",
+	})
 	tokenRes := model.RefreshResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

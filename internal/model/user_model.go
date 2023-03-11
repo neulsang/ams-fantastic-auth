@@ -6,7 +6,7 @@ type User struct {
 	Name        string `json:"name" maxLength:"255" example:"권대근"`
 	NickName    string `json:"nickName" maxLength:"36" example:"dgkwon90"`
 	PhoneNumber string `json:"phoneNumber" maxLength:"20" example:"01012344321"`
-	BirthDate   string `json:"birth_date" example:"1990-07-29"`
+	BirthDate   string `json:"birthDate" example:"1990-07-29"`
 	Gender      string `json:"gender" enums:"male, female, other" example:"male"`
 	Password    string `json:"password" maxLength:"255" example:"test1234"`
 	Qna         Qna    `json:"qna"`
@@ -39,7 +39,7 @@ type RegisterRequest struct {
 	Name        string `json:"name" maxLength:"255" example:"권대근"`
 	NickName    string `json:"nickName" maxLength:"36" example:"dgkwon90"`
 	PhoneNumber string `json:"phoneNumber" maxLength:"20" example:"01012344321"`
-	BirthDate   string `json:"birth_date" example:"1990-07-29"`
+	BirthDate   string `json:"birthDate" example:"1990-07-29"`
 	Gender      string `json:"gender" enums:"male, female, other" example:"male"`
 	Password    string `json:"password" maxLength:"255" example:"test1234"`
 	Qna         Qna    `json:"qna"`

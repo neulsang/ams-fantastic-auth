@@ -335,7 +335,7 @@ const docTemplate = `{
                 },
                 "birthDate": {
                     "type": "string",
-                    "example": "2000-01-01"
+                    "example": "1990-07-29"
                 },
                 "email": {
                     "type": "string",
@@ -358,12 +358,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "maxLength": 255,
-                    "example": "권댜군"
+                    "example": "권대근"
                 },
                 "nickName": {
                     "type": "string",
                     "maxLength": 36,
-                    "example": "늘상"
+                    "example": "dgkwon90"
                 },
                 "phoneNumber": {
                     "type": "string",
@@ -412,12 +412,12 @@ const docTemplate = `{
             "properties": {
                 "birthDate": {
                     "type": "string",
-                    "example": "2000-01-01"
+                    "example": "1990-07-29"
                 },
                 "email": {
                     "type": "string",
                     "maxLength": 255,
-                    "example": "test@clobot.com"
+                    "example": "dgkwon90@naver.com"
                 },
                 "gender": {
                     "type": "string",
@@ -431,12 +431,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "maxLength": 255,
-                    "example": "tester"
+                    "example": "권대근"
                 },
                 "nickName": {
                     "type": "string",
                     "maxLength": 36,
-                    "example": "tester"
+                    "example": "dgkwon90"
                 },
                 "password": {
                     "type": "string",
@@ -456,7 +456,7 @@ const docTemplate = `{
         "model.User": {
             "type": "object",
             "properties": {
-                "birth_date": {
+                "birthDate": {
                     "type": "string",
                     "example": "1990-07-29"
                 },

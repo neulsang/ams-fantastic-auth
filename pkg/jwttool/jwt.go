@@ -32,7 +32,7 @@ func (t *Token) GenerateNewToken(userEmail string) (string, error) {
 
 	// Set public claims:
 	claims["sub"] = userEmail
-	claims["exp"] = now.Add(t.ExpiredIn).Unix()
+	claims["exp"] = now.Add(t.ExpiredIn * time.Minute).Unix()
 	claims["iat"] = now.Unix()
 	claims["nbf"] = now.Unix()
 

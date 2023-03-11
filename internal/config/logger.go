@@ -3,8 +3,8 @@ package config
 import "ams-fantastic-auth/pkg/env"
 
 type Logger struct {
-	Level        string `mapstructure:"LOGGER_LEVEL"`
-	DisplayStyle string `mapstructure:"LOGGER_DISPLAY_STYLE"`
+	Level        string //`mapstructure:"LOGGER_LEVEL"`
+	DisplayStyle string //`mapstructure:"LOGGER_DISPLAY_STYLE"`
 }
 
 func (l *Logger) LoadConfig() {
